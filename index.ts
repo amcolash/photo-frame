@@ -6,7 +6,7 @@ import sharp from "sharp";
 
 if (!process.versions.bun) throw 'This server must be run with "bun"';
 
-const PORT = 3000;
+const PORT = Number(process.env.PORT || 3000);
 
 const size = 1200;
 const extensions = /\.(jpg|jpeg|png|gif|webp|tiff|bmp)$/i;
@@ -22,7 +22,7 @@ await resizePhotos();
 const app = express();
 app.listen(PORT, () => {
   console.log(`\nServer is running on port ${PORT}`);
-  console.log({ tmpDir, photoDir, size, extensions });
+  console.log({ PORT, tmpDir, photoDir, size, extensions });
 });
 
 app.use(express.static(tmpDir));
