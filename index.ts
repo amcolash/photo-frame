@@ -15,6 +15,20 @@ const photoDir = resolve(process.env.PHOTO_DIR || "photos/");
 
 mkdirSync(tmpDir, { recursive: true });
 
+// Run resize job every hour, as well as on server startup
+new CronJob("0 30 * * * *", resizePhotos).start();
+await resizePhotos();
+
+app.listen(PORT, () => console.log(`\nServer is running on port ${PORT}`, { tmpDir, photoDir }));
+
+app.use(express.static(tmpDir));
+app.get("/photos", (_req, res) => {
+  const files = readdirSync(tmpDir, { recursive: true }).map((f) => `/${f}`);
+  res.json({ photos: files });
+});
+
+// Functions
+
 async function resizePhotos() {
   console.log(`Resizing photos in ${photoDir}`);
 
@@ -34,13 +48,3 @@ async function resizePhotos() {
   if (resized > 0) process.stdout.write("\n");
   console.log(`Resized ${resized} photos`);
 }
-
-await resizePhotos();
-
-app.listen(PORT, () => console.log(`\nServer is running on port ${PORT}`, { tmpDir, photoDir }));
-
-app.use(express.static(tmpDir));
-app.get("/photos", (_req, res) => {
-  const files = readdirSync(tmpDir, { recursive: true }).map((f) => `/${f}`);
-  res.json({ photos: files });
-});

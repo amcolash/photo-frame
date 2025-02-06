@@ -5,9 +5,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
-    "typewatch": "tsc --noEmit --watch"
+    "server": "bun --watch index.ts"
   },
   "license": "MIT",
   "dependencies": {
