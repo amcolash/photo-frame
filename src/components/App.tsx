@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo } from 'react';
 import { PhotoData } from '~types';
 
+import { useFetch } from '../hooks/useFetch';
+import { SERVER } from '../util';
 import { Photos } from './Photos';
-import { useFetch } from './useFetch';
-import { SERVER } from './util';
 
 export function App() {
   const [count, setCount] = React.useState(0);

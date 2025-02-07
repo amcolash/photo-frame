@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useScreenSize } from '~useScreenSize';
+import { useScreenSize } from '~hooks/useScreenSize';
 
-import { PhotoData } from './types';
-import { SERVER, mod } from './util';
+import { PhotoData } from '../types';
+import { SERVER, mod } from '../util';
 
 export function Photos({ photos }: { photos: PhotoData[] }) {
   const { height: screenHeight, width: screenWidth } = useScreenSize();
