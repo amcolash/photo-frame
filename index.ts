@@ -1,5 +1,6 @@
 import { CronJob } from "cron";
 import express from "express";
+import cors from "cors";
 import { existsSync, mkdirSync, readdirSync } from "fs";
 import { basename, extname, join, resolve } from "path";
 import sharp from "sharp";
@@ -25,6 +26,7 @@ app.listen(PORT, () => {
   console.log({ PORT, tmpDir, photoDir, size, extensions });
 });
 
+app.use(cors());
 app.use(express.static(tmpDir));
 
 app.get("/photos", (_req, res) => {
