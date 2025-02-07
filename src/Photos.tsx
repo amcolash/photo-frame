@@ -28,6 +28,16 @@ export function Photos({ photos }: { photos: PhotoData[] }) {
   }, [photos]);
 
   useEffect(() => {
+    // preload next image shortly after the current one is displayed
+    setTimeout(() => {
+      const nextIndex = mod(index + 1, photos.length);
+
+      const nextImage = new Image();
+      nextImage.src = `${SERVER}${photos[nextIndex].url}`;
+    }, 5000);
+  }, [index, photos]);
+
+  useEffect(() => {
     window.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowLeft') {
         setIndex((prev) => mod(prev - 1, photos.length));
