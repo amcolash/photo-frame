@@ -6,7 +6,9 @@ import { SERVER, mod } from './util';
 
 export function Photos({ photos }: { photos: PhotoData[] }) {
   const { height: screenHeight, width: screenWidth } = useScreenSize();
+
   const [index, setIndex] = useState(0);
+  const [opacity, setOpacity] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const image = photos[index];
@@ -56,7 +58,18 @@ export function Photos({ photos }: { photos: PhotoData[] }) {
   const fadeImage = start > 1;
 
   return (
-    <div className="w-full h-full relative bg-black overflow-hidden">
+    <div
+      className="w-full h-full relative bg-black overflow-hidden"
+      onMouseDown={(e) => {
+        /* @ts-ignore */
+        if (e.target.tagName === 'BUTTON') return;
+
+        setOpacity(opacity === 0 ? 1 : 0);
+        setTimeout(() => {
+          setOpacity(0);
+        }, 10000);
+      }}
+    >
       <div
         className="w-full h-full bg-no-repeat absolute origin-center scale-105 blur-md"
         style={{
@@ -84,7 +97,10 @@ export function Photos({ photos }: { photos: PhotoData[] }) {
         }}
       />
 
-      <div className="absolute bottom-2 right-4 flex gap-4 text-white text-shadow">
+      <div
+        className="absolute bottom-2 right-4 flex gap-4 text-white text-shadow transition-opacity duration-500"
+        style={{ opacity }}
+      >
         <span>
           {index + 1} / {photos.length}
         </span>
