@@ -5,15 +5,16 @@ import { existsSync, mkdirSync, readdirSync } from 'fs';
 import { basename, extname, join, resolve } from 'path';
 import sharp from 'sharp';
 
-import { PhotoData } from './src/types';
+import { PhotoData, PORT as port } from './src/types';
 
 if (!process.versions.bun) throw 'This server must be run with "bun"';
 
-const PORT = Number(process.env.PORT || 3000);
+const PORT = Number(process.env.PORT || port);
 
 const size = 1200;
 const extensions = /\.(jpg|jpeg|png|gif|webp|tiff|bmp)$/i;
 
+const appDir = resolve(__dirname, 'dist');
 const tmpDir = resolve(process.env.TMP_DIR || '/tmp/', 'photo-frame');
 const photoDir = resolve(process.env.PHOTO_DIR || 'photos/');
 mkdirSync(tmpDir, { recursive: true });
@@ -29,7 +30,8 @@ app.listen(PORT, () => {
 });
 
 app.use(cors());
-app.use(express.static(tmpDir));
+app.use(express.static(appDir));
+app.use('/img', express.static(tmpDir));
 
 app.get('/photos', async (_req, res) => {
   const files = readdirSync(tmpDir, { recursive: true });
@@ -37,7 +39,7 @@ app.get('/photos', async (_req, res) => {
 
   for (const f of files) {
     const meta = await sharp(join(tmpDir, f.toString())).metadata();
-    data.push({ url: `/${f}`, width: meta.width || 0, height: meta.height || 0 });
+    data.push({ url: `/img/${f}`, width: meta.width || 0, height: meta.height || 0 });
   }
 
   res.json({ photos: data });
@@ -46,6 +48,7 @@ app.get('/photos', async (_req, res) => {
 app.post('/refresh', async (req, res) => {
   try {
     await resizePhotos();
+    res.status(200).send();
   } catch (err) {
     console.error('Error resizing photos:', err);
     res.status(500).send(err.message);

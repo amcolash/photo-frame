@@ -108,7 +108,7 @@ export function Photos({ photos }: { photos: PhotoData[] }) {
       />
 
       <div
-        className="absolute bottom-2 right-4 text-white text-center text-shadow transition-opacity duration-500 bg-gray-800 rounded pt-2"
+        className="absolute bottom-3 right-3 text-white text-center text-shadow transition-opacity duration-500 bg-gray-800 rounded pt-2"
         style={{ opacity }}
       >
         <span className="p-2">
@@ -135,6 +135,15 @@ export function Photos({ photos }: { photos: PhotoData[] }) {
             &gt;
           </button>
         </div>
+      </div>
+
+      <div
+        className="absolute top-3 right-3 text-white text-shadow transition-opacity duration-500 bg-gray-800 rounded p-2"
+        style={{ opacity }}
+      >
+        <button onClick={() => fetch(`${SERVER}/refresh`, { method: 'POST' }).then(() => window.location.reload())}>
+          ⟳
+        </button>
       </div>
     </div>
   );
