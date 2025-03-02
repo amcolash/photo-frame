@@ -74,7 +74,7 @@ export function Photos({ photos }: { photos: PhotoData[] }) {
         /* @ts-ignore */
         if (e.target.tagName === 'BUTTON') return;
 
-        setOpacity(opacity === 0 ? 1 : 0);
+        setOpacity(opacity === 0 ? 0.7 : 0);
         setTimeout(() => {
           setOpacity(0);
         }, 10000);
@@ -108,29 +108,33 @@ export function Photos({ photos }: { photos: PhotoData[] }) {
       />
 
       <div
-        className="absolute bottom-2 right-4 flex gap-4 text-white text-shadow transition-opacity duration-500"
+        className="absolute bottom-2 right-4 text-white text-center text-shadow transition-opacity duration-500 bg-gray-800 rounded pt-2"
         style={{ opacity }}
       >
-        <span>
+        <span className="p-2">
           {index + 1} / {photos.length}
         </span>
 
-        <button
-          onClick={() => {
-            setIndex(mod(index - 1, photos.length));
-            resetTimer();
-          }}
-        >
-          &lt;
-        </button>
-        <button
-          onClick={() => {
-            setIndex(mod(index + 1, photos.length));
-            resetTimer();
-          }}
-        >
-          &gt;
-        </button>
+        <div className="flex gap-2 justify-center">
+          <button
+            onClick={() => {
+              setIndex(mod(index - 1, photos.length));
+              resetTimer();
+            }}
+            className="p-2"
+          >
+            &lt;
+          </button>
+          <button
+            onClick={() => {
+              setIndex(mod(index + 1, photos.length));
+              resetTimer();
+            }}
+            className="p-2"
+          >
+            &gt;
+          </button>
+        </div>
       </div>
     </div>
   );
