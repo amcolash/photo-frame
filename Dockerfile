@@ -1,5 +1,5 @@
-# Use bun alpine image
-FROM oven/bun:alpine
+# Use node 22 + bun alpine image
+FROM imbios/bun-node:22-alpine
 
 # Create app directory
 WORKDIR /usr/src/app
