@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  photo-frame:
+    image: amcolash/photo-frame-2
+    container_name: photo-frame-2
+    build: ./
+    network_mode: 'host'
+    volumes:
+      - ./tmp:/tmp
+      - ./photos:/usr/src/app/photos
+    entrypoint: bun run docker
+    restart: unless-stopped

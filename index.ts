@@ -76,7 +76,7 @@ async function resizePhotos() {
       if (!existsSync(tmpFile)) {
         process.stdout.write('.');
 
-        await sharp(f).resize(size, size, { fit: 'inside' }).toFile(tmpFile);
+        await sharp(f).resize(size, size, { fit: 'inside' }).jpeg({ quality: 75 }).toFile(tmpFile);
         resized++;
       }
     } catch (e) {
