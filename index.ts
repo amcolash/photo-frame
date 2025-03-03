@@ -18,9 +18,8 @@ const tmpDir = resolve(process.env.TMP_DIR || '/tmp/', 'photo-frame');
 const photoDir = resolve(process.env.PHOTO_DIR || 'photos/');
 mkdirSync(tmpDir, { recursive: true });
 
-// Run resize job every hour, as well as on server startup. Until resizing is done, we can't trust the server data
+// Run resize job every hour
 new CronJob('0 30 * * * *', resizePhotos).start();
-resizePhotos();
 
 const app = express();
 app.listen(PORT, () => {
@@ -58,6 +57,9 @@ app.get('/status', (_req, res) => {
   const status: ServerStatus = { serverTime, port: PORT };
   res.json(status);
 });
+
+// Run resize job on startup. Done after initial logging, but data will be incomplete until it is done.
+resizePhotos();
 
 // Functions
 async function resizePhotos() {
