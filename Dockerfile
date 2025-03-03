@@ -1,14 +1,14 @@
-# Use node 22 + bun alpine image
-FROM imbios/bun-node:22-alpine
+# Use node 22
+FROM node:22-alpine
 
 # Create app directory
 WORKDIR /usr/src/app
 
 # For caching purposes, install deps without other changed files
-COPY package.json bun.lockb ./
+COPY package.json package-lock.json ./
 
 # Install deps
-RUN bun install
+RUN npm ci
 
 # Copy source code
 COPY . ./

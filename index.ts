@@ -7,8 +7,6 @@ import sharp from 'sharp';
 
 import { PhotoData, ServerStatus, PORT as port } from './src/types';
 
-if (!process.versions.bun) throw 'This server must be run with "bun"';
-
 const PORT = Number(process.env.PORT || port);
 const serverTime = Date.now();
 
@@ -20,9 +18,9 @@ const tmpDir = resolve(process.env.TMP_DIR || '/tmp/', 'photo-frame');
 const photoDir = resolve(process.env.PHOTO_DIR || 'photos/');
 mkdirSync(tmpDir, { recursive: true });
 
-// Run resize job every hour, as well as on server startup
+// Run resize job every hour, as well as on server startup. Until resizing is done, we can't trust the server data
 new CronJob('0 30 * * * *', resizePhotos).start();
-await resizePhotos();
+resizePhotos();
 
 const app = express();
 app.listen(PORT, () => {

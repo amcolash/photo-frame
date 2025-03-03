@@ -5,8 +5,8 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "server": "bun --watch index.ts",
-    "docker": "bun index.ts"
+    "server": "tsx watch index.ts",
+    "docker": "tsx index.ts"
   },
   "license": "MIT",
   "dependencies": {
@@ -28,6 +28,7 @@
     "autoprefixer": "^10.4.20",
     "babel-preset-nano-react-app": "^0.1.0",
     "prettier": "^3.4.2",
+    "tsx": "^4.19.3",
     "typescript": "^5.7.3",
     "vite": "^6.1.0",
     "vite-tsconfig-paths": "^5.1.4"
