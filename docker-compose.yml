@@ -10,4 +10,6 @@ services:
       - ./tmp:/tmp
       - ./photos:/usr/src/app/photos
     entrypoint: npm run docker
+    env_file:
+      - .env
     restart: unless-stopped
