@@ -5,11 +5,12 @@ import { existsSync, mkdirSync, readdirSync } from 'fs';
 import { basename, extname, join, resolve } from 'path';
 import sharp from 'sharp';
 
-import { PhotoData, PORT as port } from './src/types';
+import { PhotoData, ServerStatus, PORT as port } from './src/types';
 
 if (!process.versions.bun) throw 'This server must be run with "bun"';
 
 const PORT = Number(process.env.PORT || port);
+const serverTime = Date.now();
 
 const size = 1200;
 const extensions = /\.(jpg|jpeg|png|gif|webp|tiff|bmp)$/i;
@@ -53,6 +54,11 @@ app.post('/refresh', async (req, res) => {
     console.error('Error resizing photos:', err);
     res.status(500).send(err.message);
   }
+});
+
+app.get('/status', (_req, res) => {
+  const status: ServerStatus = { serverTime, port: PORT };
+  res.json(status);
 });
 
 // Functions

@@ -63,11 +63,11 @@ export function Photos({ photos }: { photos: PhotoData[] }) {
           backgroundImage: `url(${url})`,
           backgroundSize: '100% 100%',
 
-          transform: 'scale(105%)',
-          transformOrigin: 'center',
-
-          WebkitTransform: 'scale(105%)',
+          WebkitTransform: 'scale(1.1)',
           WebkitTransformOrigin: 'center',
+
+          transform: 'scale(1.1)',
+          transformOrigin: 'center',
 
           filter: 'blur(10px)',
           WebkitFilter: 'blur(10px)',

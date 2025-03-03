@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 
 import { useFetch } from '../hooks/useFetch';
-import { PhotoData } from '../types';
+import { PhotoData, ServerStatus } from '../types';
 import { SERVER } from '../util';
 import { Photos } from './Photos';
 
@@ -12,9 +12,21 @@ export function App() {
 
   // Fetch new data every hour
   useEffect(() => {
-    const interval = setInterval(() => setCount((prev) => prev + 1), 60 * 60 * 1000);
+    const photoInterval = setInterval(() => setCount((prev) => prev + 1), 60 * 60 * 1000);
 
-    return () => clearInterval(interval);
+    let serverTime: number;
+
+    // Check server status every 30 seconds. Restart if server time changes
+    const statusInterval = setInterval(async () => {
+      const data: ServerStatus = await (await fetch(`${SERVER}/status`)).json();
+      if (!serverTime) serverTime = data.serverTime;
+      if (serverTime !== data.serverTime) window.location.reload();
+    }, 30 * 1000);
+
+    return () => {
+      clearInterval(photoInterval);
+      clearInterval(statusInterval);
+    };
   }, []);
 
   return (
