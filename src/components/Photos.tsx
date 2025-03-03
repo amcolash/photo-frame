@@ -1,53 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useScreenSize } from '~hooks/useScreenSize';
+import { useSlideshow } from 'hooks/useSlideshow';
+import React, { useState } from 'react';
 
+import { useScreenSize } from '../hooks/useScreenSize';
 import { PhotoData } from '../types';
 import { SERVER, mod } from '../util';
+import { Overlay } from './Overlay';
 
 export function Photos({ photos }: { photos: PhotoData[] }) {
   const { height: screenHeight, width: screenWidth } = useScreenSize();
-
-  const [index, setIndex] = useState(0);
+  const { index, setIndex, resetTimer } = useSlideshow(photos);
   const [opacity, setOpacity] = useState(0);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const image = photos[index];
   const url = `${SERVER}${image.url}`;
   const dims = { width: image.width, height: image.height };
-
-  const resetTimer = () => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => setIndex((prev) => (prev + 1) % photos.length), 2 * 60 * 1000);
-  };
-
-  useEffect(() => {
-    resetTimer();
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [photos]);
-
-  useEffect(() => {
-    // preload next image shortly after the current one is displayed
-    setTimeout(() => {
-      const nextIndex = mod(index + 1, photos.length);
-
-      const nextImage = new Image();
-      nextImage.src = `${SERVER}${photos[nextIndex].url}`;
-    }, 5000);
-  }, [index, photos]);
-
-  useEffect(() => {
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') {
-        setIndex((prev) => mod(prev - 1, photos.length));
-        resetTimer();
-      } else if (e.key === 'ArrowRight') {
-        setIndex((prev) => mod(prev + 1, photos.length));
-        resetTimer();
-      }
-    });
-  }, []);
 
   // Get information about the dimensions / ratio of the image
   const tall = dims.height > dims.width;
@@ -69,28 +35,55 @@ export function Photos({ photos }: { photos: PhotoData[] }) {
 
   return (
     <div
-      className="w-full h-full relative bg-black overflow-hidden"
       onMouseDown={(e) => {
         /* @ts-ignore */
-        if (e.target.tagName === 'BUTTON') return;
+        if (e.target.tagName === 'BUTTON' || e.target.parentElement?.tagName === 'BUTTON') return;
 
-        setOpacity(opacity === 0 ? 0.7 : 0);
+        setOpacity(opacity === 0 ? 0.6 : 0);
         setTimeout(() => {
           setOpacity(0);
         }, 10000);
       }}
+      style={{
+        width: '100%',
+        height: '100%',
+        position: 'relative',
+        background: 'black',
+        overflow: 'hidden',
+      }}
     >
       <div
-        className="w-full h-full bg-no-repeat absolute origin-center scale-105 blur-md"
         style={{
+          width: '100%',
+          height: '100%',
+          position: 'absolute',
+
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
           backgroundImage: `url(${url})`,
           backgroundSize: '100% 100%',
+
+          transform: 'scale(105%)',
+          transformOrigin: 'center',
+
+          WebkitTransform: 'scale(105%)',
+          WebkitTransformOrigin: 'center',
+
+          filter: 'blur(10px)',
+          WebkitFilter: 'blur(10px)',
         }}
       />
 
       <div
-        className="bg-contain w-full h-full bg-no-repeat bg-center inset-0 absolute"
         style={{
+          backgroundSize: 'contain',
+          width: '100%',
+          height: '100%',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
+          inset: 0,
+          position: 'absolute',
+
           backgroundImage: `url(${url})`,
           maskImage: fadeImage
             ? `linear-gradient(${tall ? '0' : '90'}deg, rgba(0,0,0,0) ${start}%, rgba(255,255,255,1) ${end}%, rgba(255,255,255,1) ${
@@ -107,44 +100,7 @@ export function Photos({ photos }: { photos: PhotoData[] }) {
         }}
       />
 
-      <div
-        className="absolute bottom-3 right-3 text-white text-center text-shadow transition-opacity duration-500 bg-gray-800 rounded pt-2"
-        style={{ opacity }}
-      >
-        <span className="p-2">
-          {index + 1} / {photos.length}
-        </span>
-
-        <div className="flex gap-2 justify-center">
-          <button
-            onClick={() => {
-              setIndex(mod(index - 1, photos.length));
-              resetTimer();
-            }}
-            className="p-2"
-          >
-            &lt;
-          </button>
-          <button
-            onClick={() => {
-              setIndex(mod(index + 1, photos.length));
-              resetTimer();
-            }}
-            className="p-2"
-          >
-            &gt;
-          </button>
-        </div>
-      </div>
-
-      <div
-        className="absolute top-3 right-3 text-white text-shadow transition-opacity duration-500 bg-gray-800 rounded p-2"
-        style={{ opacity }}
-      >
-        <button onClick={() => fetch(`${SERVER}/refresh`, { method: 'POST' }).then(() => window.location.reload())}>
-          ⟳
-        </button>
-      </div>
+      <Overlay index={index} setIndex={setIndex} opacity={opacity} photos={photos} resetTimer={resetTimer} />
     </div>
   );
 }
