@@ -25,6 +25,9 @@ const app = express();
 app.listen(PORT, () => {
   console.log(`\nServer is running on port ${PORT}`);
   console.log({ PORT, tmpDir, photoDir, size, extensions });
+
+  // Run resize job on startup. Done after initial logging, but data will be incomplete until it is done.
+  resizePhotos();
 });
 
 app.use(cors());
@@ -58,16 +61,15 @@ app.get('/status', (_req, res) => {
   res.json(status);
 });
 
-// Run resize job on startup. Done after initial logging, but data will be incomplete until it is done.
-resizePhotos();
-
 // Functions
 async function resizePhotos() {
-  console.log(`Resizing photos in ${photoDir}`);
+  console.log(`\nResizing photos in ${photoDir}`);
 
   const files = readdirSync(photoDir, { recursive: true })
     .map((f) => join(photoDir, f))
     .filter((f) => extname(f).match(extensions));
+
+  console.log('Found', files.length, 'files');
 
   let resized = 0;
   for (const f of files) {
