@@ -14,7 +14,7 @@ RUN npm ci
 COPY . ./
 
 # Build static site
-RUN bun run build
+RUN npm run build
 
 # Set things up
 EXPOSE 8500
