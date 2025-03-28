@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 import { useScreenSize } from '../hooks/useScreenSize';
 import { PhotoData } from '../types';
-import { SERVER, mod } from '../util';
+import { SERVER } from '../util';
 import { Overlay } from './Overlay';
 
 export function Photos({ photos }: { photos: PhotoData[] }) {
