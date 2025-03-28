@@ -16,6 +16,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-error-boundary": "^5.0.0",
+    "seedrandom": "^3.0.5",
     "sharp": "^0.33.5",
     "whatwg-fetch": "^3.6.20"
   },
