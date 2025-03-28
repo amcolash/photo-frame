@@ -5,6 +5,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import 'whatwg-fetch';
 
 import { App } from './components/App';
+import './index.css';
 
 function fallbackRender({ error }: { error: Error }) {
   return (

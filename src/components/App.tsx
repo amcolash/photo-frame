@@ -7,20 +7,19 @@ import { SERVER } from '../util';
 import { Photos } from './Photos';
 
 export function App() {
-  const [count, setCount] = React.useState(0);
-  const { data, loading, error } = useFetch<{ photos: PhotoData[] }>(`${SERVER}/photos?cache=${count}`);
+  const [cache, setCache] = React.useState(Date.now());
+  const { data, loading, error } = useFetch<{ photos: PhotoData[] }>(`${SERVER}/photos?cache=${cache}`);
 
   useRestart();
 
   // Fetch new data every 5 minutes
   useEffect(() => {
-    const photoInterval = setInterval(() => setCount((prev) => prev + 1), 5 * 60 * 1000);
+    const photoInterval = setInterval(() => setCache(Date.now()), 5 * 60 * 1000);
     return () => clearInterval(photoInterval);
   }, []);
 
   return (
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
-      {count}
       {loading && !data ? (
         <p>Loading...</p>
       ) : error ? (
