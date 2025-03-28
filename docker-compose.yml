@@ -8,7 +8,7 @@ services:
     network_mode: 'host'
     volumes:
       - ./tmp:/tmp
-      - ./photos:/usr/src/app/photos
+      - "/var/services/homes/amcolash/data/Google Photos:/usr/src/app/photos"
     entrypoint: npm run docker
     env_file:
       - .env
