@@ -1,5 +1,5 @@
 import { useRestart } from 'hooks/useRestart';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 
 import { useFetch } from '../hooks/useFetch';
 import { PhotoData } from '../types';
@@ -9,19 +9,25 @@ import { Photos } from './Photos';
 export function App() {
   const [count, setCount] = React.useState(0);
   const { data, loading, error } = useFetch<{ photos: PhotoData[] }>(`${SERVER}/photos?cache=${count}`);
-  const shuffled = useMemo(() => data?.photos.sort(() => Math.random() - 0.5), [data]);
 
   useRestart();
 
-  // Fetch new data every hour
+  // Fetch new data every 5 minutes
   useEffect(() => {
-    const photoInterval = setInterval(() => setCount((prev) => prev + 1), 60 * 60 * 1000);
+    const photoInterval = setInterval(() => setCount((prev) => prev + 1), 5 * 60 * 1000);
     return () => clearInterval(photoInterval);
   }, []);
 
   return (
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
-      {loading ? <p>Loading...</p> : error ? <p>Error: {error.message}</p> : <Photos photos={shuffled || []} />}
+      {count}
+      {loading && !data ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p>Error: {error.message}</p>
+      ) : (
+        <Photos photos={data?.photos || []} />
+      )}
     </div>
   );
 }
