@@ -1,10 +1,12 @@
 import { useScreenSize } from 'hooks/useScreenSize';
 import React from 'react';
 import { PhotoData } from 'types';
+import { SERVER } from 'util';
 
 export function Photo({ photo }: { photo: PhotoData }) {
   const { height: screenHeight, width: screenWidth } = useScreenSize();
-  const { url, width, height } = photo;
+  const { url: rawUrl, width, height } = photo;
+  const url = `${SERVER}${rawUrl}`;
 
   const dims = { width: width || screenWidth, height: height || screenHeight };
 
