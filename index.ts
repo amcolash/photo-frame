@@ -2,7 +2,8 @@ import cors from 'cors';
 import { CronJob } from 'cron';
 import express from 'express';
 import { existsSync, mkdirSync, readdirSync } from 'fs';
-import { basename, extname, join, resolve } from 'path';
+import { rm } from 'fs/promises';
+import { basename, dirname, extname, join, resolve } from 'path';
 import sharp from 'sharp';
 
 import { PhotoData, ServerStatus, PORT as port } from './src/types';
@@ -63,29 +64,60 @@ app.get('/status', (_req, res) => {
 
 // Functions
 async function resizePhotos() {
-  console.log(`\nResizing photos in ${photoDir}`);
+  try {
+    console.log(`\nResizing photos in ${photoDir}`);
 
-  const files = readdirSync(photoDir, { recursive: true })
-    .map((f) => join(photoDir, f))
-    .filter((f) => extname(f).match(extensions));
+    const files = readdirSync(photoDir, { recursive: true })
+      .map((f) => join(photoDir, f))
+      .filter((f) => extname(f).match(extensions));
 
-  console.log('Found', files.length, 'files');
+    console.log('Found', files.length, 'files');
 
-  let resized = 0;
-  for (const f of files) {
-    try {
-      const tmpFile = join(tmpDir, basename(f));
-      if (!existsSync(tmpFile)) {
-        process.stdout.write('.');
+    // remove tmp files that don't match new files
+    const tmpFiles = readdirSync(tmpDir, { recursive: true }).map((f) => join(tmpDir, f));
 
-        await sharp(f).resize(size, size, { fit: 'inside' }).jpeg({ quality: 75 }).toFile(tmpFile);
-        resized++;
+    const finalFiles: string[] = [];
+
+    let resized = 0;
+    for (const f of files) {
+      try {
+        let dir = basename(dirname(f));
+        if (dir === 'photos') dir = '';
+        else dir = dir + '_';
+
+        const tmpFile = join(tmpDir, dir + basename(f));
+        finalFiles.push(tmpFile);
+
+        if (!existsSync(tmpFile)) {
+          process.stdout.write('.');
+
+          await sharp(f).resize(size, size, { fit: 'inside' }).jpeg({ quality: 75 }).toFile(tmpFile);
+          resized++;
+        }
+      } catch (e) {
+        console.error(`Error resizing ${f}: ${e.message}`);
       }
-    } catch (e) {
-      console.error(`Error resizing ${f}: ${e.message}`);
     }
-  }
 
-  if (resized > 0) process.stdout.write('\n');
-  console.log(`Resized ${resized} photos`);
+    if (resized > 0) process.stdout.write('\n');
+    console.log(`Resized ${resized} photos`);
+
+    console.log('Cleaning up tmp dir');
+
+    // remove tmp files that are not in the final files
+    for (const tmpFile of tmpFiles) {
+      if (!finalFiles.includes(tmpFile)) {
+        try {
+          process.stdout.write('x');
+          await rm(tmpFile);
+        } catch (e) {
+          console.error(`Error removing ${tmpFile}: ${e.message}`);
+        }
+      }
+    }
+
+    console.log();
+  } catch (err) {
+    console.error('Error resizing photos:', err);
+  }
 }

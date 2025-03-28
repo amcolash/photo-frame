@@ -6,7 +6,7 @@ import 'whatwg-fetch';
 
 import { App } from './components/App';
 
-function fallbackRender({ error, resetErrorBoundary }) {
+function fallbackRender({ error }: { error: Error }) {
   return (
     <div role="alert">
       <p>Something went wrong:</p>
