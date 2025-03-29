@@ -1,3 +1,4 @@
+import { useOverlayOpacity } from 'hooks/useOverlayOpacity';
 import chevronLeft from 'icons/chevron-left.svg';
 import chevronRight from 'icons/chevron-right.svg';
 import rotate from 'icons/rotate-cw.svg';
@@ -23,22 +24,7 @@ const overlayStyle: React.CSSProperties = {
 };
 
 export function Overlay({ index, length, prev, next }: OverlayProps) {
-  const [opacity, setOpacity] = React.useState(0);
-
-  useEffect(() => {
-    const listener = (e: MouseEvent) => {
-      /* @ts-ignore */
-      if (e.target.tagName === 'BUTTON' || e.target.parentElement?.tagName === 'BUTTON') return;
-
-      setOpacity(opacity === 0 ? 0.6 : 0);
-      setTimeout(() => {
-        setOpacity(0);
-      }, 10000);
-    };
-
-    window.addEventListener('mousedown', listener);
-    () => window.removeEventListener('mousedown', listener);
-  }, [opacity]);
+  const opacity = useOverlayOpacity();
 
   return (
     <>
