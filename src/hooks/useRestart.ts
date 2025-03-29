@@ -16,7 +16,7 @@ export function useRestart() {
       } catch (err) {
         console.error('Error fetching server status:', err);
       }
-    }, 5 * 1000);
+    }, 15 * 1000);
 
     return () => {
       clearInterval(statusInterval);
