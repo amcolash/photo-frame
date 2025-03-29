@@ -3,7 +3,7 @@ import React from 'react';
 import { PhotoData } from 'types';
 import { SERVER } from 'util';
 
-export function Photo({ photo }: { photo: PhotoData }) {
+export function Photo({ photo, active }: { photo: PhotoData; active: boolean }) {
   const { height: screenHeight, width: screenWidth } = useScreenSize();
   const { url: rawUrl, width, height } = photo;
   const url = `${SERVER}${rawUrl}`;
@@ -33,9 +33,11 @@ export function Photo({ photo }: { photo: PhotoData }) {
       style={{
         width: '100%',
         height: '100%',
-        position: 'relative',
+        position: 'absolute',
         background: 'black',
         overflow: 'hidden',
+        visibility: active ? 'visible' : 'hidden',
+        top: active ? 0 : '100%',
       }}
     >
       <div

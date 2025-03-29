@@ -2,7 +2,7 @@ import { useSlideshow } from 'hooks/useSlideshow';
 import React, { useState } from 'react';
 
 import { PhotoData } from '../types';
-import { SERVER } from '../util';
+import { SERVER, mod } from '../util';
 import { Overlay } from './Overlay';
 import { Photo } from './Photo';
 
@@ -10,8 +10,11 @@ export function Photos({ photos }: { photos: PhotoData[] }) {
   const { index, setIndex, resetTimer } = useSlideshow(photos);
   const [opacity, setOpacity] = useState(0);
 
-  const image = photos[index];
-  const url = `${SERVER}${image.url}`;
+  const index1 = Math.floor(index / 2) * 2;
+  const index2 = Math.floor(index / 2) * 2 + 1;
+
+  const active1 = index % 2 === 0;
+  const active2 = index % 2 !== 0;
 
   return (
     <div
@@ -32,7 +35,9 @@ export function Photos({ photos }: { photos: PhotoData[] }) {
         overflow: 'hidden',
       }}
     >
-      <Photo photo={photos[index]} />
+      <Photo photo={photos[index1]} active={active1} />
+      <Photo photo={photos[index2]} active={active2} />
+
       <Overlay index={index} setIndex={setIndex} opacity={opacity} photos={photos} resetTimer={resetTimer} />
     </div>
   );
