@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { PhotoData } from 'types';
-import { SERVER, mod } from 'util';
+import { mod } from 'util';
 
 export function useSlideshow(photos: PhotoData[]) {
   const [index, setIndex] = useState(0);

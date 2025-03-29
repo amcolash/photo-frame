@@ -1,10 +1,9 @@
+import { Photos } from 'components/Photos';
+import { useFetch } from 'hooks/useFetch';
 import { useRestart } from 'hooks/useRestart';
 import React, { useEffect } from 'react';
-
-import { useFetch } from '../hooks/useFetch';
-import { PhotoData } from '../types';
-import { SERVER } from '../util';
-import { Photos } from './Photos';
+import { PhotoData } from 'types';
+import { SERVER } from 'util';
 
 export function App() {
   const [cache, setCache] = React.useState(Date.now());

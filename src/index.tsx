@@ -1,11 +1,10 @@
+import { App } from 'components/App';
+import 'index.css';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { ErrorBoundary } from 'react-error-boundary';
 /* polyfill fetch for iPad */
 import 'whatwg-fetch';
-
-import { App } from './components/App';
-import './index.css';
 
 function fallbackRender({ error }: { error: Error }) {
   return (

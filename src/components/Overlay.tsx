@@ -1,9 +1,8 @@
+import chevronLeft from 'icons/chevron-left.svg';
+import chevronRight from 'icons/chevron-right.svg';
+import rotate from 'icons/rotate-cw.svg';
 import React from 'react';
-
-import chevronLeft from '../icons/chevron-left.svg';
-import chevronRight from '../icons/chevron-right.svg';
-import rotate from '../icons/rotate-cw.svg';
-import { SERVER, mod } from '../util';
+import { SERVER, mod } from 'util';
 
 type OverlayProps = {
   index: number;

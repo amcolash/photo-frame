@@ -1,4 +1,4 @@
-import { PORT } from './types';
+import { PORT } from 'types';
 
 export const SERVER = `${window.location.protocol}//${window.location.hostname}:${PORT}`;
 
