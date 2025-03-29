@@ -55,7 +55,7 @@ export function Photo({
 
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          backgroundImage: `url(${url})`,
+          backgroundImage: `url("${url}")`,
           backgroundSize: '100% 100%',
 
           WebkitTransform: 'scale(1.1)',
@@ -79,7 +79,7 @@ export function Photo({
           inset: 0,
           position: 'absolute',
 
-          backgroundImage: `url(${url})`,
+          backgroundImage: `url("${url}")`,
           maskImage: fadeImage
             ? `linear-gradient(${tall ? '0' : '90'}deg, rgba(0,0,0,0) ${start}%, rgba(255,255,255,1) ${end}%, rgba(255,255,255,1) ${
                 100 - end
