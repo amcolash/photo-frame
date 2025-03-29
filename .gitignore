@@ -130,3 +130,6 @@ dist
 .pnp.*
 
 tmp/
+
+photos/
+photos2/
