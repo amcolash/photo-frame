@@ -58,6 +58,7 @@ app.get('/photo/:index', async (req, res) => {
     previous: shuffledPhotos[prev],
     current: shuffledPhotos[index],
     next: shuffledPhotos[next],
+    index,
     total: shuffledPhotos.length,
   };
 

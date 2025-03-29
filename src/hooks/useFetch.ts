@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from 'react';
 
 interface FetchOptions {
-  method?: "GET" | "POST" | "PUT" | "DELETE";
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   headers?: HeadersInit;
   body?: BodyInit;
 }
@@ -12,7 +12,7 @@ interface FetchResult<T> {
   error: Error | null;
 }
 
-export const useFetch = <T>(url: string, options?: FetchOptions): FetchResult<T> => {
+export const useFetch = <T>(url: string, options?: FetchOptions, delay?: number): FetchResult<T> => {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -23,7 +23,7 @@ export const useFetch = <T>(url: string, options?: FetchOptions): FetchResult<T>
       try {
         const response = await fetch(url, options);
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error('Network response was not ok');
         }
         const jsonData: T = await response.json();
         setData(jsonData);
@@ -34,8 +34,14 @@ export const useFetch = <T>(url: string, options?: FetchOptions): FetchResult<T>
       }
     };
 
-    fetchData();
-  }, [url, options]);
+    if (!delay) {
+      fetchData();
+      return;
+    }
+
+    const timeout = setTimeout(() => fetchData(), delay);
+    return () => clearTimeout(timeout);
+  }, [url, options, delay]);
 
   return { data, loading, error };
 };

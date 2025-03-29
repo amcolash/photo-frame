@@ -7,6 +7,9 @@ export default defineConfig({
   build: {
     sourcemap: true,
   },
+  server: {
+    host: '0.0.0.0',
+  },
   plugins: [
     tsconfigPaths(),
     legacy({
