@@ -1,32 +1,33 @@
 import { Overlay } from 'components/Overlay';
 import { Photo } from 'components/Photo';
+import { useFetch } from 'hooks/useFetch';
 import { useScreenSize } from 'hooks/useScreenSize';
 import { useSlideshow } from 'hooks/useSlideshow';
-import React, { useState } from 'react';
-import { PhotoData } from 'types';
+import React, { useEffect, useState } from 'react';
+import { PhotoIndex } from 'types';
+import { SERVER } from 'util';
 
-export function Photos({ photos }: { photos: PhotoData[] }) {
+export function Photos() {
   const screen = useScreenSize();
-  const { index, setIndex, resetTimer } = useSlideshow(photos);
-  const [opacity, setOpacity] = useState(0);
 
-  const index1 = (Math.ceil(index / 2) * 2) % photos.length;
-  const index2 = (Math.floor(index / 2) * 2 + 1) % photos.length;
+  const [length, setLength] = useState(1);
+  const { index, prev, next } = useSlideshow(length);
+
+  const { loading, error, data } = useFetch<PhotoIndex>(`${SERVER}/photo/${index}`);
+
+  // Set length when data is fetched
+  useEffect(() => setLength(data?.total || 1), [data]);
 
   const active1 = index % 2 === 0;
   const active2 = index % 2 !== 0;
 
+  if (loading && !data) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  if (!data) return null;
+
   return (
     <div
-      onMouseDown={(e) => {
-        /* @ts-ignore */
-        if (e.target.tagName === 'BUTTON' || e.target.parentElement?.tagName === 'BUTTON') return;
-
-        setOpacity(opacity === 0 ? 0.6 : 0);
-        setTimeout(() => {
-          setOpacity(0);
-        }, 10000);
-      }}
       style={{
         width: '100%',
         height: '100%',
@@ -39,10 +40,11 @@ export function Photos({ photos }: { photos: PhotoData[] }) {
         {index1} {active1 && 'X'} {photos[index1].url} | {index2} {active2 && 'X'} {photos[index2].url}
       </div> */}
 
-      <Photo photo={photos[index1]} screen={screen} active={active1} />
-      <Photo photo={photos[index2]} screen={screen} active={active2} />
+      {/* Flip flop between the two photos, so a preloaded one is always ready to be rendered w/o flash */}
+      <Photo photo={active1 ? data.current : data.next} active={active1} screen={screen} />
+      <Photo photo={active2 ? data.current : data.next} active={active2} screen={screen} />
 
-      <Overlay index={index} setIndex={setIndex} opacity={opacity} photos={photos} resetTimer={resetTimer} />
+      <Overlay index={index} length={length} prev={prev} next={next} />
     </div>
   );
 }

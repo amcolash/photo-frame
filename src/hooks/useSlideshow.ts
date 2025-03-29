@@ -1,14 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
-import { PhotoData } from 'types';
 import { mod } from 'util';
 
-export function useSlideshow(photos: PhotoData[]) {
+export function useSlideshow(length: number) {
   const [index, setIndex] = useState(0);
   const intervalRef = useRef<number | null>(null);
 
   const resetTimer = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => setIndex((prev) => (prev + 1) % photos.length), 2 * 60 * 1000);
+    intervalRef.current = setInterval(() => setIndex((prev) => (prev + 1) % length), 2 * 60 * 1000);
+  };
+
+  const prev = () => {
+    setIndex((prev) => mod(prev - 1, length));
+    resetTimer();
+  };
+
+  const next = () => {
+    setIndex((prev) => mod(prev + 1, length));
+    resetTimer();
   };
 
   useEffect(() => {
@@ -16,29 +25,20 @@ export function useSlideshow(photos: PhotoData[]) {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [photos]);
-
-  // useEffect(() => {
-  //   // preload next image shortly after the current one is displayed
-  //   setTimeout(() => {
-  //     const nextIndex = mod(index + 1, photos.length);
-
-  //     const nextImage = new Image();
-  //     nextImage.src = `${SERVER}${photos[nextIndex].url}`;
-  //   }, 5000);
-  // }, [index, photos]);
+  }, [length]);
 
   useEffect(() => {
-    window.addEventListener('keydown', (e) => {
+    const listener = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft') {
-        setIndex((prev) => mod(prev - 1, photos.length));
-        resetTimer();
+        prev();
       } else if (e.key === 'ArrowRight') {
-        setIndex((prev) => mod(prev + 1, photos.length));
-        resetTimer();
+        next();
       }
-    });
-  }, []);
+    };
 
-  return { index, setIndex, resetTimer };
+    window.addEventListener('keydown', listener);
+    return () => window.removeEventListener('keydown', listener);
+  }, [length]);
+
+  return { index, prev, next };
 }
