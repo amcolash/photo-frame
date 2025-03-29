@@ -7,10 +7,11 @@ import { basename, dirname, extname, join, resolve } from 'path';
 import seedrandom from 'seedrandom';
 import sharp from 'sharp';
 
-import { PhotoData, ServerStatus, PORT as port } from './src/types';
+import { PhotoData, PhotoIndex, ServerStatus, PORT as port } from './src/types';
 
 const PORT = Number(process.env.PORT || port);
 const serverTime = Date.now();
+let seed = 0;
 
 const size = 1200;
 const extensions = /\.(jpg|jpeg|png|gif|webp|tiff|bmp)$/i;
@@ -24,6 +25,12 @@ let shuffledPhotos: PhotoData[] = [];
 
 // Run resize job every hour
 new CronJob('0 30 * * * *', resizePhotos).start();
+
+// Reset shuffled photos every week
+new CronJob('0 0 * * 0', () => {
+  shuffledPhotos = [];
+  seed++;
+}).start();
 
 const app = express();
 app.listen(PORT, () => {
@@ -42,7 +49,20 @@ app.get('/photos', async (_req, res) => {
   res.json({ photos: shuffledPhotos });
 });
 
-app.get('/index');
+app.get('/photo/:index', async (req, res) => {
+  const index = mod(Number(req.params.index), shuffledPhotos.length);
+  const prev = mod(index - 1, shuffledPhotos.length);
+  const next = mod(index + 1, shuffledPhotos.length);
+
+  const data: PhotoIndex = {
+    previous: shuffledPhotos[prev],
+    current: shuffledPhotos[index],
+    next: shuffledPhotos[next],
+    total: shuffledPhotos.length,
+  };
+
+  res.json(data);
+});
 
 app.post('/refresh', async (req, res) => {
   try {
@@ -55,7 +75,7 @@ app.post('/refresh', async (req, res) => {
 });
 
 app.get('/status', (_req, res) => {
-  const status: ServerStatus = { serverTime, port: PORT };
+  const status: ServerStatus = { serverTime, port: PORT, numPhotos: shuffledPhotos.length };
   res.json(status);
 });
 
@@ -80,7 +100,7 @@ async function updateShuffledPhotos() {
   const newPhotos = data.filter((p) => !shuffledPhotos.some((s) => s.url === p.url));
 
   // shuffle new photos and append to the existing array
-  // shuffledPhotos = stableShuffle(shuffledPhotos, newPhotos, serverTime.toString());
+  // shuffledPhotos = stableShuffle(shuffledPhotos, newPhotos, (serverTime + seed).toString());
   shuffledPhotos = [...shuffledPhotos, ...newPhotos];
 }
 
@@ -153,4 +173,9 @@ function stableShuffle(existingArray, newItems, seed) {
 
   let combined = [...existingArray, ...shuffledNewItems];
   return combined;
+}
+
+// Mod that handles negative numbers
+export function mod(n: number, m: number): number {
+  return ((n % m) + m) % m;
 }
