@@ -101,8 +101,8 @@ async function updateShuffledPhotos() {
   const newPhotos = data.filter((p) => !shuffledPhotos.some((s) => s.url === p.url));
 
   // shuffle new photos and append to the existing array
-  // shuffledPhotos = stableShuffle(shuffledPhotos, newPhotos, (serverTime + seed).toString());
-  shuffledPhotos = [...shuffledPhotos, ...newPhotos];
+  shuffledPhotos = stableShuffle(shuffledPhotos, newPhotos, (serverTime + seed).toString());
+  // shuffledPhotos = [...shuffledPhotos, ...newPhotos];
 }
 
 async function resizePhotos() {

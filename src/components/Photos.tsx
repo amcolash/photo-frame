@@ -7,6 +7,8 @@ import React, { useEffect, useState } from 'react';
 import { PhotoData, PhotoIndex } from 'types';
 import { SERVER } from 'util';
 
+import Swiper from './Swiper';
+
 export function Photos() {
   const screen = useScreenSize();
 
@@ -45,9 +47,21 @@ export function Photos() {
         </div>
       </div> */}
 
-      {/* Flip flop between the two photos, so a preloaded one is always ready to be rendered w/o flash */}
-      <Photo active={active1} photo={photo1} screen={screen} />
-      <Photo active={active2} photo={photo2} screen={screen} />
+      <Swiper
+        onSwipe={({ deltaX, deltaY }) => {
+          if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            if (deltaX > 0) {
+              prev();
+            } else {
+              next();
+            }
+          }
+        }}
+      >
+        {/* Flip flop between the two photos, so a preloaded one is always ready to be rendered w/o flash */}
+        <Photo active={active1} photo={photo1} screen={screen} />
+        <Photo active={active2} photo={photo2} screen={screen} />
+      </Swiper>
 
       <Overlay index={index} length={length} prev={prev} next={next} />
     </div>
