@@ -39,6 +39,28 @@ app.use(express.static(appDir));
 app.use('/img', express.static(tmpDir));
 
 app.get('/photos', async (_req, res) => {
+  res.json({ photos: shuffledPhotos });
+});
+
+app.get('/index');
+
+app.post('/refresh', async (req, res) => {
+  try {
+    await resizePhotos();
+    res.status(200).send();
+  } catch (err) {
+    console.error('Error resizing photos:', err);
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/status', (_req, res) => {
+  const status: ServerStatus = { serverTime, port: PORT };
+  res.json(status);
+});
+
+// Functions
+async function updateShuffledPhotos() {
   const files = readdirSync(tmpDir, { recursive: true }).filter((f) => extname(f.toString()).match(extensions));
   const data: PhotoData[] = [];
 
@@ -58,27 +80,10 @@ app.get('/photos', async (_req, res) => {
   const newPhotos = data.filter((p) => !shuffledPhotos.some((s) => s.url === p.url));
 
   // shuffle new photos and append to the existing array
-  shuffledPhotos = stableShuffle(shuffledPhotos, newPhotos, serverTime.toString());
+  // shuffledPhotos = stableShuffle(shuffledPhotos, newPhotos, serverTime.toString());
+  shuffledPhotos = [...shuffledPhotos, ...newPhotos];
+}
 
-  res.json({ photos: shuffledPhotos });
-});
-
-app.post('/refresh', async (req, res) => {
-  try {
-    await resizePhotos();
-    res.status(200).send();
-  } catch (err) {
-    console.error('Error resizing photos:', err);
-    res.status(500).send(err.message);
-  }
-});
-
-app.get('/status', (_req, res) => {
-  const status: ServerStatus = { serverTime, port: PORT };
-  res.json(status);
-});
-
-// Functions
 async function resizePhotos() {
   try {
     console.log(`\nResizing photos in ${photoDir}`);
@@ -136,6 +141,9 @@ async function resizePhotos() {
   } catch (err) {
     console.error('Error resizing photos:', err);
   }
+
+  // After resize, update the shuffled photos
+  await updateShuffledPhotos();
 }
 
 // From chatgpt
