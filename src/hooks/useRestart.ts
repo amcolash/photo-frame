@@ -5,23 +5,19 @@ import { SERVER } from 'util';
 export function useRestart() {
   // Check client + server time
   useEffect(() => {
-    let clientTime: number;
     let serverTime: number;
+    let clientTime: number;
 
-    fetch(`${SERVER}/build.json?cache=${Date.now()}`)
-      .then((res) => res.json())
-      .then((data) => (clientTime = data.buildTime))
-      .catch((err) => console.error(err));
-
-    // Check server status every 15 seconds. Restart if server time changes
+    // Check server status every 15 seconds. Restart if server/client time changes
     const statusInterval = setInterval(async () => {
       try {
         const url = `${SERVER}/status?cache=${Date.now()}`;
         const data: ServerStatus = await (await fetch(url)).json();
         if (!serverTime) serverTime = data.serverTime;
+        if (!clientTime) clientTime = data.clientTime;
 
         const serverOutdated = serverTime !== data.serverTime;
-        const clientOutdated = clientTime && clientTime !== data.clientTime;
+        const clientOutdated = clientTime !== data.clientTime;
 
         if (serverOutdated || clientOutdated) window.location.reload();
       } catch (err) {
