@@ -84,9 +84,9 @@ function Bottom({
         right: '1.5rem',
       }}
     >
-      <span style={{ padding: '0.75rem' }}>
+      <div style={{ padding: '0.25rem', userSelect: 'none' }}>
         {index + 1} / {length}
-      </span>
+      </div>
 
       <div style={{ display: 'flex', gap: '0.25rem', justifyContent: 'center' }}>
         <button disabled={opacity === 0} onClick={prev} style={{ padding: '0.75rem' }}>

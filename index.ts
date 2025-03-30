@@ -11,7 +11,7 @@ import sharp from 'sharp';
 import { PhotoData, PhotoIndex, ServerStatus, PORT as port } from './src/types';
 
 const PORT = Number(process.env.PORT || port);
-const serverTime = Date.now();
+const serverTime = new Date();
 let seed = 0;
 
 const size = 1200;
@@ -87,7 +87,12 @@ app.get('/status', async (_req, res) => {
     .then((data) => JSON.parse(data).buildTime)
     .catch(() => 'unknown');
 
-  const status: ServerStatus = { serverTime, clientTime, port: PORT, numPhotos: shuffledPhotos.length };
+  const status: ServerStatus = {
+    serverTime: serverTime.toISOString(),
+    clientTime,
+    port: PORT,
+    numPhotos: shuffledPhotos.length,
+  };
   res.json(status);
 });
 
@@ -124,7 +129,7 @@ async function updateShuffledPhotos() {
   const newPhotos = data.filter((p) => !shuffledPhotos.some((s) => s.url === p.url));
 
   // shuffle new photos and append to the existing array
-  shuffledPhotos = stableShuffle(shuffledPhotos, newPhotos, (serverTime + seed).toString());
+  shuffledPhotos = stableShuffle(shuffledPhotos, newPhotos, serverTime + seed.toString());
   // shuffledPhotos = [...shuffledPhotos, ...newPhotos];
 }
 
