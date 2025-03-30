@@ -75,8 +75,12 @@ app.post('/refresh', async (req, res) => {
   }
 });
 
-app.get('/status', (_req, res) => {
-  const status: ServerStatus = { serverTime, port: PORT, numPhotos: shuffledPhotos.length };
+app.get('/status', async (_req, res) => {
+  const clientTime = await readFile(join(__dirname, 'dist', 'build.json'), 'utf8')
+    .then((data) => JSON.parse(data).buildTime)
+    .catch(() => 'unknown');
+
+  const status: ServerStatus = { serverTime, clientTime, port: PORT, numPhotos: shuffledPhotos.length };
   res.json(status);
 });
 
