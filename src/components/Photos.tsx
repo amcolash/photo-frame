@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { PhotoData, PhotoIndex } from 'types';
 import { SERVER } from 'util';
 
+import { ErrorMessage } from './ErrorMessage';
 import Swiper from './Swiper';
 
 export function Photos() {
@@ -16,28 +17,20 @@ export function Photos() {
   const { index, prev, next } = useSlideshow(length);
 
   // Delay subsequent fetches, so that there is not a black flicker on iPad
-  const delay = index === 0 ? 0 : 1000;
+  const delay = index === 0 ? 0 : 500;
 
   const { loading, error, data } = useFetch<PhotoIndex>(`${SERVER}/photo/${index}`, undefined, delay);
   useEffect(() => setLength(data?.total || 1), [data]);
 
   if (loading && !data) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  if (error) return <ErrorMessage error={error} />;
 
   if (!data) return null;
 
   const { active1, active2, photo1, photo2 } = getActivePhotos(data, index);
 
   return (
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        position: 'relative',
-        background: 'black',
-        overflow: 'hidden',
-      }}
-    >
+    <>
       {/* <div style={{ position: 'absolute', top: 0, left: 0, color: 'white', fontSize: '2em', zIndex: 10 }}>
         <div>
           1 {photo1 === data.previous ? 'prev' : photo1 === data.current ? 'curr' : 'next'} {active1 && 'X'}
@@ -64,7 +57,7 @@ export function Photos() {
       </Swiper>
 
       <Overlay index={index} length={length} prev={prev} next={next} />
-    </div>
+    </>
   );
 }
 

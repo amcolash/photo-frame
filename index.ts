@@ -23,6 +23,7 @@ const photoDir = resolve(process.env.PHOTO_DIR || 'photos/');
 mkdirSync(tmpDir, { recursive: true });
 
 let shuffledPhotos: PhotoData[] = [];
+let resizeProgress: number | undefined = undefined;
 
 // Run resize job every hour
 new CronJob('0 30 * * * *', resizePhotos).start();
@@ -34,12 +35,13 @@ new CronJob('0 0 * * 0', () => {
 }).start();
 
 const app = express();
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`\nServer is running on port ${PORT}`);
   console.log({ PORT, tmpDir, photoDir, size, extensions });
 
   // Run resize job on startup. Done after initial logging, but data will be incomplete until it is done.
-  resizePhotos();
+  await resizePhotos();
+  resizeProgress = undefined;
 });
 
 app.use(cors());
@@ -51,6 +53,12 @@ app.get('/photos', async (_req, res) => {
 });
 
 app.get('/photo/:index', async (req, res) => {
+  if (shuffledPhotos.length === 0) {
+    console.error('Error: No photos found');
+    res.status(500).json({ error: 'No photos found' });
+    return;
+  }
+
   const index = mod(Number(req.params.index), shuffledPhotos.length);
   const prev = mod(index - 1, shuffledPhotos.length);
   const next = mod(index + 1, shuffledPhotos.length);
@@ -79,6 +87,9 @@ app.post('/refresh', async (req, res) => {
   } catch (err) {
     console.error('Error resizing photos:', err);
     res.status(500).send(err.message);
+  } finally {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    resizeProgress = undefined;
   }
 });
 
@@ -92,6 +103,7 @@ app.get('/status', async (_req, res) => {
     clientTime,
     port: PORT,
     numPhotos: shuffledPhotos.length,
+    resizeProgress,
   };
   res.json(status);
 });
@@ -149,7 +161,9 @@ async function resizePhotos() {
     const finalFiles: string[] = [];
 
     let resized = 0;
-    for (const f of files) {
+    resizeProgress = 0;
+    for (let i = 0; i < files.length; i++) {
+      const f = files[i];
       try {
         let dir = basename(dirname(f));
         if (dir === 'photos') dir = '';
@@ -164,10 +178,16 @@ async function resizePhotos() {
           await sharp(f).keepMetadata().resize(size, size, { fit: 'inside' }).jpeg({ quality: 75 }).toFile(tmpFile);
           resized++;
         }
+
+        resizeProgress = (i + 1) / files.length;
       } catch (e) {
         console.error(`Error resizing ${f}: ${e.message}`);
       }
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
+
+    resizeProgress = 0.95;
 
     if (resized > 0) process.stdout.write('\n');
     console.log(`Resized ${resized} photos`);
@@ -192,7 +212,11 @@ async function resizePhotos() {
   }
 
   // After resize, update the shuffled photos
-  await updateShuffledPhotos();
+  try {
+    await updateShuffledPhotos();
+  } catch (err) {
+    console.error('Error updating shuffled photos:', err);
+  }
 }
 
 // From chatgpt
