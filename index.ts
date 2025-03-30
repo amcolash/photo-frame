@@ -2,7 +2,7 @@ import cors from 'cors';
 import { CronJob } from 'cron';
 import express from 'express';
 import { existsSync, mkdirSync, readdirSync } from 'fs';
-import { rm } from 'fs/promises';
+import { readFile, rm } from 'fs/promises';
 import { basename, dirname, extname, join, resolve } from 'path';
 import seedrandom from 'seedrandom';
 import sharp from 'sharp';
@@ -61,6 +61,12 @@ app.get('/photo/:index', async (req, res) => {
     index,
     total: shuffledPhotos.length,
   };
+
+  if (!data.previous || !data.current || !data.next) {
+    console.error('Error: Missing photo data', req.params.index, index, prev, next);
+    res.status(500).json({ error: 'Missing photo data' });
+    return;
+  }
 
   res.json(data);
 });

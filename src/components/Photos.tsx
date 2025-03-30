@@ -59,8 +59,8 @@ export function Photos() {
         }}
       >
         {/* Flip flop between the two photos, so a preloaded one is always ready to be rendered w/o flash */}
-        <Photo active={active1} photo={photo1} screen={screen} />
-        <Photo active={active2} photo={photo2} screen={screen} />
+        {photo1 && <Photo active={active1} photo={photo1} screen={screen} />}
+        {photo2 && <Photo active={active2} photo={photo2} screen={screen} />}
       </Swiper>
 
       <Overlay index={index} length={length} prev={prev} next={next} />
