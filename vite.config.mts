@@ -20,7 +20,7 @@ export default defineConfig({
       {
         type: 'json',
         output: './build.json',
-        data: { buildTime: Date.now() },
+        data: { buildTime: new Date() },
       },
     ]),
   ],
