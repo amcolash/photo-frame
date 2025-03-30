@@ -64,8 +64,8 @@ export function Photo({
           transform: 'scale(1.1)',
           transformOrigin: 'center',
 
-          filter: 'blur(10px)',
-          WebkitFilter: 'blur(10px)',
+          filter: 'blur(40px)',
+          WebkitFilter: 'blur(40px)',
         }}
       />
 

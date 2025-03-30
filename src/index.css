@@ -12,7 +12,11 @@ button {
   color: #fff;
 }
 
-.image-gallery-content .image-gallery-slide .image-gallery-image {
-  max-height: 100vh;
-  max-width: 100vw;
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

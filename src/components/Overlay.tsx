@@ -2,7 +2,7 @@ import { useOverlayOpacity } from 'hooks/useOverlayOpacity';
 import chevronLeft from 'icons/chevron-left.svg';
 import chevronRight from 'icons/chevron-right.svg';
 import rotate from 'icons/rotate-cw.svg';
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { SERVER } from 'util';
 
 type OverlayProps = {
@@ -35,21 +35,28 @@ export function Overlay({ index, length, prev, next }: OverlayProps) {
 }
 
 function Top({ opacity }: { opacity: number }) {
+  const [refreshing, setRefreshing] = useState(false);
+
   return (
     <div
       style={{
         ...overlayStyle,
-        opacity,
+        opacity: refreshing ? 1 : opacity,
         top: '1.5rem',
         right: '1.5rem',
       }}
     >
       <button
-        disabled={opacity === 0}
+        disabled={opacity === 0 || refreshing}
         style={{ padding: '0.5rem' }}
-        onClick={() => fetch(`${SERVER}/refresh`, { method: 'POST' }).then(() => window.location.reload())}
+        onClick={() => {
+          if (refreshing) return;
+          setRefreshing(true);
+
+          fetch(`${SERVER}/refresh`, { method: 'POST' }).then(() => window.location.reload());
+        }}
       >
-        <img src={rotate} />
+        <img src={rotate} style={{ animation: refreshing ? '1s infinite spin' : undefined }} />
       </button>
     </div>
   );

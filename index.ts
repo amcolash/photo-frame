@@ -1,5 +1,6 @@
 import cors from 'cors';
 import { CronJob } from 'cron';
+import exif from 'exif-reader';
 import express from 'express';
 import { existsSync, mkdirSync, readdirSync } from 'fs';
 import { readFile, rm } from 'fs/promises';
@@ -98,7 +99,19 @@ async function updateShuffledPhotos() {
   for (const f of files) {
     try {
       const meta = await sharp(join(tmpDir, f.toString())).metadata();
-      data.push({ url: `/img/${f}`, width: meta.width || 0, height: meta.height || 0 });
+      const img = { url: `/img/${f}`, width: meta.width || 0, height: meta.height || 0 };
+
+      // if (meta.exif) {
+      //   const metadata = exif(meta.exif);
+
+      //   const make = metadata.Image?.Make;
+      //   const model = metadata.Image?.Model;
+      //   const date = metadata.Image?.DateTime;
+
+      //   console.log(make, model, date);
+      // }
+
+      data.push(img);
     } catch (err) {
       console.error('Error reading metadata:', err);
     }
@@ -143,7 +156,7 @@ async function resizePhotos() {
         if (!existsSync(tmpFile)) {
           process.stdout.write('.');
 
-          await sharp(f).resize(size, size, { fit: 'inside' }).jpeg({ quality: 75 }).toFile(tmpFile);
+          await sharp(f).keepMetadata().resize(size, size, { fit: 'inside' }).jpeg({ quality: 75 }).toFile(tmpFile);
           resized++;
         }
       } catch (e) {
