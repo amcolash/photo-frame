@@ -163,6 +163,10 @@ async function resizePhotos() {
     let resized = 0;
     resizeProgress = 0;
     for (let i = 0; i < files.length; i++) {
+      if (i % 25 === 0) {
+        console.log(`${i / files.length}%`);
+      }
+
       const f = files[i];
       try {
         let dir = basename(dirname(f));
@@ -186,6 +190,8 @@ async function resizePhotos() {
 
       // await new Promise((resolve) => setTimeout(resolve, 1000));
     }
+
+    console.log('100%');
 
     resizeProgress = 0.95;
 
