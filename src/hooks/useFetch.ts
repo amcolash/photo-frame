@@ -23,7 +23,10 @@ export const useFetch = <T>(url: string, options?: FetchOptions, delay?: number)
       try {
         const response = await fetch(url, options);
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          const message = await response.text();
+          throw new Error(
+            `Network response was not ok. [${response.status}]: ${response.statusText}${message ? ` - ${message}` : ''}`
+          );
         }
         const jsonData: T = await response.json();
         setData(jsonData);

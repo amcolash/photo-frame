@@ -55,7 +55,7 @@ app.get('/photos', async (_req, res) => {
 app.get('/photo/:index', async (req, res) => {
   if (shuffledPhotos.length === 0) {
     console.error('Error: No photos found');
-    res.status(500).json({ error: 'No photos found' });
+    res.status(500).send('No photos found');
     return;
   }
 
@@ -73,7 +73,7 @@ app.get('/photo/:index', async (req, res) => {
 
   if (!data.previous || !data.current || !data.next) {
     console.error('Error: Missing photo data', req.params.index, index, prev, next);
-    res.status(500).json({ error: 'Missing photo data' });
+    res.status(500).send('Missing photo data');
     return;
   }
 
@@ -184,7 +184,7 @@ async function resizePhotos() {
         console.error(`Error resizing ${f}: ${e.message}`);
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
     resizeProgress = 0.95;
