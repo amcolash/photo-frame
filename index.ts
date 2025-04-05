@@ -116,17 +116,19 @@ async function updateShuffledPhotos() {
   for (const f of files) {
     try {
       const meta = await sharp(join(tmpDir, f.toString())).metadata();
-      const img = { url: `/img/${f}`, width: meta.width || 0, height: meta.height || 0 };
+      const img: PhotoData = { url: `/img/${f}`, width: meta.width || 0, height: meta.height || 0 };
 
-      // if (meta.exif) {
-      //   const metadata = exif(meta.exif);
+      if (meta.exif) {
+        const metadata = exif(meta.exif);
 
-      //   const make = metadata.Image?.Make;
-      //   const model = metadata.Image?.Model;
-      //   const date = metadata.Image?.DateTime;
+        const make = metadata.Image?.Make;
+        const model = metadata.Image?.Model;
+        const date = metadata.Image?.DateTime;
 
-      //   console.log(make, model, date);
-      // }
+        img.date = date?.toISOString();
+
+        // console.log(make, model, date);
+      }
 
       data.push(img);
     } catch (err) {

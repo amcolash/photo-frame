@@ -11,7 +11,7 @@ export function Photo({
   screen: { width: number; height: number };
   active: boolean;
 }) {
-  const { url: rawUrl, width, height } = photo;
+  const { url: rawUrl, width, height, date } = photo;
   const { width: screenWidth, height: screenHeight } = screen;
   const url = `${SERVER}${rawUrl}`;
 
@@ -58,11 +58,11 @@ export function Photo({
           backgroundImage: `url("${url}")`,
           backgroundSize: '100% 100%',
 
-          WebkitTransform: 'scale(1.1)',
-          WebkitTransformOrigin: 'center',
-
           transform: 'scale(1.1)',
+          WebkitTransform: 'scale(1.1)',
+
           transformOrigin: 'center',
+          WebkitTransformOrigin: 'center',
 
           filter: 'blur(40px)',
           WebkitFilter: 'blur(40px)',
@@ -94,6 +94,23 @@ export function Photo({
             : undefined,
         }}
       />
+
+      {date && (
+        <pre
+          style={{
+            position: 'absolute',
+            bottom: '1rem',
+            left: '1rem',
+            color: 'white',
+            margin: 0,
+            fontSize: '0.85rem',
+            fontFamily: 'sans-serif',
+            textShadow: '0px 1px 3px rgba(0, 0, 0, 0.5)',
+          }}
+        >
+          {new Date(date).toLocaleString().replace(', ', '\n')}
+        </pre>
+      )}
     </div>
   );
 }

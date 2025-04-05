@@ -12,6 +12,7 @@ export function Progress({ progress }: { progress?: number }) {
         background: '#4499cc',
         zIndex: 1,
         transition: 'all 0.5s ease-in-out',
+        WebkitTransition: 'all 0.5s ease-in-out',
       }}
     />
   );
