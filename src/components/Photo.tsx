@@ -96,20 +96,18 @@ export function Photo({
       />
 
       {date && (
-        <pre
+        <div
           style={{
             position: 'absolute',
             bottom: '1rem',
             left: '1rem',
             color: 'white',
-            margin: 0,
             fontSize: '0.85rem',
-            fontFamily: 'sans-serif',
             textShadow: '0px 1px 3px rgba(0, 0, 0, 0.5)',
           }}
         >
-          {new Date(date).toLocaleString().replace(', ', '\n')}
-        </pre>
+          {new Date(date).toLocaleDateString([], { month: 'long', day: '2-digit', year: 'numeric' })}
+        </div>
       )}
     </div>
   );
